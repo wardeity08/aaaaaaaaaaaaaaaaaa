@@ -1,0 +1,1265 @@
+:root {
+  --bg: #f5f5f2;
+  --surface: #ffffff;
+  --surface-2: #ecece7;
+  --text: #20241f;
+  --muted: #70766f;
+  --accent: #315f4b;
+  --accent-2: #b86b4b;
+  --border: rgba(32, 36, 31, 0.12);
+  --shadow: 0 15px 40px rgba(32, 36, 31, 0.08);
+  --radius: 18px;
+}
+
+
+/* =========================================================
+   LIGHT
+========================================================= */
+
+body[data-theme="light"] {
+  --bg: #f5f5f2;
+  --surface: #ffffff;
+  --surface-2: #ecece7;
+  --text: #20241f;
+  --muted: #70766f;
+  --accent: #315f4b;
+  --accent-2: #b86b4b;
+  --border: rgba(32, 36, 31, 0.12);
+  --shadow: 0 15px 40px rgba(32, 36, 31, 0.08);
+  --radius: 18px;
+}
+
+
+/* =========================================================
+   COZY LIBRARY
+========================================================= */
+
+body[data-theme="cozy"] {
+  --bg: #eadcc7;
+  --surface: #fff7e9;
+  --surface-2: #ddc9aa;
+  --text: #3b2d20;
+  --muted: #766452;
+  --accent: #6b4934;
+  --accent-2: #a7653d;
+  --border: rgba(59, 45, 32, 0.16);
+  --shadow: 0 18px 40px rgba(70, 45, 25, 0.13);
+  --radius: 10px;
+}
+
+
+/* =========================================================
+   CAFE & BOOKS
+========================================================= */
+
+body[data-theme="cafe"] {
+  --bg: #e7ddd2;
+  --surface: #faf5ee;
+  --surface-2: #d7c8b8;
+  --text: #332b27;
+  --muted: #75685f;
+  --accent: #356f6a;
+  --accent-2: #b46c48;
+  --border: rgba(51, 43, 39, 0.16);
+  --shadow: 0 20px 45px rgba(51, 43, 39, 0.12);
+  --radius: 24px;
+}
+
+
+/* =========================================================
+   EDITORIAL
+========================================================= */
+
+body[data-theme="editorial"] {
+  --bg: #f0eee7;
+  --surface: #faf9f4;
+  --surface-2: #dedfd8;
+  --text: #17241e;
+  --muted: #626a64;
+  --accent: #1d4d39;
+  --accent-2: #9a4e48;
+  --border: rgba(23, 36, 30, 0.18);
+  --shadow: 0 8px 25px rgba(23, 36, 30, 0.06);
+  --radius: 3px;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+
+  font-family: "DM Sans", Arial, sans-serif;
+
+  transition:
+    background 0.35s ease,
+    color 0.35s ease;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 16px 5%;
+
+  background: color-mix(
+    in srgb,
+    var(--bg) 92%,
+    transparent
+  );
+
+  backdrop-filter: blur(16px);
+
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  text-decoration: none;
+
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.brand-mark {
+  font-size: 25px;
+}
+
+.main-nav {
+  display: flex;
+  gap: 30px;
+}
+
+.main-nav a {
+  text-decoration: none;
+  color: var(--muted);
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+  color: var(--text);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
+/* =========================================================
+   THEME PICKER
+========================================================= */
+
+.theme-picker {
+  position: relative;
+}
+
+.theme-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 9px 13px;
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  background: var(--surface);
+  color: var(--text);
+
+  cursor: pointer;
+}
+
+.theme-dot {
+  width: 9px;
+  height: 9px;
+
+  border-radius: 50%;
+
+  background: var(--accent);
+}
+
+.theme-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+
+  width: 250px;
+
+  padding: 10px;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: 14px;
+
+  box-shadow: var(--shadow);
+}
+
+.theme-menu-title {
+  padding: 8px 10px 10px;
+
+  color: var(--muted);
+
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.theme-option {
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 10px;
+
+  background: transparent;
+  color: var(--text);
+
+  border: 0;
+  border-radius: 9px;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+.theme-option:hover {
+  background: var(--surface-2);
+}
+
+.theme-option small {
+  display: block;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.theme-swatch {
+  width: 25px;
+  height: 25px;
+  border-radius: 7px;
+}
+
+.light-swatch {
+  background: #f5f5f2;
+  border: 1px solid #ccc;
+}
+
+.cozy-swatch {
+  background: #eadcc7;
+}
+
+.cafe-swatch {
+  background: #356f6a;
+}
+
+.editorial-swatch {
+  background: #1d4d39;
+}
+
+.check {
+  opacity: 0;
+}
+
+.theme-option.selected .check {
+  opacity: 1;
+}
+
+
+/* =========================================================
+   ADD BOOK BUTTON
+========================================================= */
+
+.add-book {
+  padding: 10px 15px;
+
+  background: var(--accent);
+  color: white;
+
+  border-radius: 10px;
+
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+  padding: 100px 5% 65px;
+}
+
+.hero-inner {
+  max-width: 1150px;
+  margin: auto;
+}
+
+.hero-copy {
+  max-width: 800px;
+}
+
+.eyebrow,
+.section-kicker {
+  margin: 0 0 15px;
+
+  color: var(--accent);
+
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.hero h1 {
+  margin: 0;
+
+  font-family: "Playfair Display", Georgia, serif;
+
+  font-size: clamp(50px, 8vw, 92px);
+  line-height: 0.98;
+  letter-spacing: -3px;
+}
+
+.hero h1 em {
+  color: var(--accent-2);
+}
+
+.hero-text {
+  max-width: 650px;
+
+  margin: 25px 0;
+
+  color: var(--muted);
+
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 12px 18px;
+
+  border-radius: var(--radius);
+
+  text-decoration: none;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  border: 1px solid transparent;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+}
+
+.button.primary {
+  background: var(--accent);
+  color: white;
+}
+
+.button.secondary {
+  background: var(--surface);
+  color: var(--text);
+
+  border-color: var(--border);
+}
+
+.hero-note {
+  margin-top: 60px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  color: var(--muted);
+
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.hero-note span {
+  width: 35px;
+  height: 1px;
+  background: var(--accent);
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.search-section {
+  padding: 0 5% 50px;
+}
+
+.search-box {
+  max-width: 1150px;
+  margin: auto;
+
+  display: flex;
+  align-items: center;
+
+  padding: 8px 12px;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  box-shadow: var(--shadow);
+}
+
+.search-symbol {
+  padding: 0 10px;
+
+  color: var(--muted);
+
+  font-size: 25px;
+}
+
+.search-box input {
+  flex: 1;
+
+  min-width: 0;
+
+  padding: 13px;
+
+  border: 0;
+  outline: 0;
+
+  background: transparent;
+  color: var(--text);
+}
+
+.search-box select {
+  padding: 11px;
+
+  border: 0;
+  outline: 0;
+
+  background: var(--surface);
+  color: var(--text);
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   LIBRARY
+========================================================= */
+
+.library-section {
+  max-width: 1150px;
+
+  margin: auto;
+
+  padding: 35px 5% 90px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+
+  margin-bottom: 30px;
+}
+
+.section-heading h2 {
+  margin: 0;
+
+  font-family: "Playfair Display", Georgia, serif;
+
+  font-size: 45px;
+}
+
+#resultCount {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   BOOK GRID
+========================================================= */
+
+.book-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 22px;
+}
+
+.book-card {
+  overflow: hidden;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  box-shadow: var(--shadow);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.book-card:hover {
+  transform: translateY(-7px);
+
+  box-shadow:
+    0 22px 45px
+    rgba(0, 0, 0, 0.12);
+}
+
+
+/* =========================================================
+   REAL COVER IMAGE
+========================================================= */
+
+.book-cover {
+  position: relative;
+
+  height: 285px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      var(--accent),
+      var(--accent-2)
+    );
+
+  color: white;
+}
+
+.book-cover img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+
+  transition:
+    transform 0.4s ease;
+}
+
+.book-card:hover .book-cover img {
+  transform: scale(1.04);
+}
+
+.cover-fallback {
+  height: 100%;
+
+  display: flex;
+  align-items: flex-end;
+
+  padding: 22px;
+
+  font-family: "Playfair Display", Georgia, serif;
+
+  font-size: 25px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   BOOK INFORMATION
+========================================================= */
+
+.book-info {
+  padding: 18px;
+}
+
+.book-info h3 {
+  margin: 0 0 7px;
+
+  font-family: "Playfair Display", Georgia, serif;
+
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+.book-author,
+.book-genre {
+  color: var(--muted);
+
+  font-size: 13px;
+}
+
+.book-genre {
+  margin-top: 7px;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.empty-state {
+  padding: 70px 20px;
+
+  text-align: center;
+
+  background: var(--surface);
+
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+.empty-state > div {
+  font-size: 40px;
+  color: var(--muted);
+}
+
+.empty-state h3 {
+  margin-bottom: 5px;
+}
+
+.empty-state p {
+  color: var(--muted);
+}
+
+
+/* =========================================================
+   FEATURE STRIP
+========================================================= */
+
+.feature-strip {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 1px;
+
+  background: var(--border);
+
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.feature {
+  display: flex;
+  gap: 15px;
+
+  padding: 35px 5%;
+
+  background: var(--surface);
+}
+
+.feature-icon {
+  font-size: 25px;
+}
+
+.feature strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.feature p {
+  margin: 0;
+
+  color: var(--muted);
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   SUBMIT / ABOUT
+========================================================= */
+
+.content-section {
+  max-width: 1150px;
+
+  margin: auto;
+
+  padding: 90px 5%;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 60px;
+
+  align-items: start;
+}
+
+.content-copy h2,
+.about h2 {
+  margin: 0;
+
+  font-family: "Playfair Display", Georgia, serif;
+
+  font-size: clamp(38px, 5vw, 58px);
+
+  line-height: 1.05;
+}
+
+.content-copy > p:not(.section-kicker) {
+  color: var(--muted);
+
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   UPLOAD FORM
+========================================================= */
+
+.content-card {
+  padding: 30px;
+
+  background: var(--surface);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  box-shadow: var(--shadow);
+}
+
+.book-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+.book-form label {
+  margin-top: 8px;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.book-form input[type="text"],
+.book-form input[type="file"] {
+  width: 100%;
+
+  padding: 12px;
+
+  background: var(--bg);
+  color: var(--text);
+
+  border: 1px solid var(--border);
+  border-radius: 10px;
+
+  outline: none;
+}
+
+.book-form input:focus {
+  border-color: var(--accent);
+}
+
+.book-form small {
+  margin-top: -5px;
+
+  color: var(--muted);
+
+  font-size: 11px;
+}
+
+.book-form .button {
+  margin-top: 15px;
+}
+
+
+/* =========================================================
+   UPLOAD STATUS
+========================================================= */
+
+.upload-status {
+  min-height: 20px;
+
+  margin: 8px 0 0;
+
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.upload-status[data-status="loading"] {
+  color: var(--accent);
+}
+
+.upload-status[data-status="success"] {
+  color: #287047;
+}
+
+.upload-status[data-status="error"] {
+  color: #a33d3d;
+}
+
+
+/* =========================================================
+   ABOUT
+========================================================= */
+
+.about {
+  border-top: 1px solid var(--border);
+}
+
+.about > p {
+  color: var(--muted);
+
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+  padding: 35px 5%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: var(--surface-2);
+
+  border-top: 1px solid var(--border);
+
+  color: var(--muted);
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: var(--text);
+}
+
+
+/* =========================================================
+   READER
+========================================================= */
+
+.reader-page {
+  min-height: 100vh;
+
+  background: var(--bg);
+  color: var(--text);
+
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.reader-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 5%;
+
+  background: color-mix(
+    in srgb,
+    var(--bg) 92%,
+    transparent
+  );
+
+  backdrop-filter: blur(15px);
+
+  border-bottom: 1px solid var(--border);
+}
+
+.reader-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.reader-title {
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 600;
+  font-size: 19px;
+}
+
+.back-button,
+.reader-theme {
+  background: var(--surface);
+  color: var(--text);
+
+  border: 1px solid var(--border);
+
+  border-radius: 10px;
+
+  padding: 9px 14px;
+
+  cursor: pointer;
+}
+
+.reader-container {
+  width: min(900px, calc(100% - 30px));
+
+  margin: auto;
+
+  padding: 60px 0 100px;
+}
+
+.reader-book-title {
+  margin: 0;
+
+  font-family: "Playfair Display", Georgia, serif;
+
+  font-size: clamp(38px, 6vw, 65px);
+
+  line-height: 1.05;
+}
+
+.reader-author {
+  margin-top: 12px;
+  margin-bottom: 45px;
+
+  color: var(--muted);
+}
+
+
+/* =========================================================
+   READER CONTENT
+========================================================= */
+
+#readerContent {
+  width: 100%;
+
+  padding: 55px 65px;
+
+  background: var(--surface);
+  color: var(--text);
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  box-shadow: var(--shadow);
+
+  font-family: Georgia, "Times New Roman", serif;
+
+  font-size: 19px;
+  line-height: 1.9;
+}
+
+#readerContent * {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+
+#readerContent p {
+  margin: 0 0 24px;
+}
+
+#readerContent h1,
+#readerContent h2,
+#readerContent h3,
+#readerContent h4,
+#readerContent h5,
+#readerContent h6 {
+  margin-top: 45px;
+  margin-bottom: 18px;
+
+  font-family: Georgia, "Times New Roman", serif;
+
+  line-height: 1.3;
+}
+
+#readerContent img {
+  max-width: 100%;
+  height: auto;
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.progress-wrapper {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 4px;
+
+  z-index: 2000;
+}
+
+#progressBar {
+  width: 0;
+  height: 100%;
+
+  background: var(--accent);
+
+  transition: width 0.1s linear;
+}
+
+
+/* =========================================================
+   THEME-SPECIFIC DESIGN DIFFERENCES
+========================================================= */
+
+
+/* COZY = more traditional book-like */
+
+body[data-theme="cozy"] .hero h1,
+body[data-theme="cozy"] .section-heading h2,
+body[data-theme="cozy"] .content-copy h2,
+body[data-theme="cozy"] .about h2 {
+  letter-spacing: -1px;
+}
+
+body[data-theme="cozy"] .book-card {
+  box-shadow: 0 12px 25px rgba(65, 40, 20, 0.12);
+}
+
+body[data-theme="cozy"] .book-cover {
+  height: 300px;
+}
+
+
+/* CAFE = rounded, relaxed */
+
+body[data-theme="cafe"] .book-card,
+body[data-theme="cafe"] .content-card,
+body[data-theme="cafe"] .search-box {
+  border-radius: 24px;
+}
+
+body[data-theme="cafe"] .hero {
+  padding-top: 75px;
+}
+
+body[data-theme="cafe"] .feature {
+  padding-top: 45px;
+  padding-bottom: 45px;
+}
+
+
+/* EDITORIAL = sharp, newspaper-like */
+
+body[data-theme="editorial"] .topbar {
+  border-bottom: 2px solid var(--text);
+}
+
+body[data-theme="editorial"] .book-card,
+body[data-theme="editorial"] .content-card,
+body[data-theme="editorial"] .search-box {
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+body[data-theme="editorial"] .book-grid {
+  gap: 15px;
+}
+
+body[data-theme="editorial"] .hero h1 {
+  font-size: clamp(52px, 8vw, 100px);
+}
+
+body[data-theme="editorial"] .section-heading h2 {
+  text-transform: uppercase;
+  letter-spacing: -1px;
+}
+
+body[data-theme="editorial"] .feature-strip {
+  border-top: 2px solid var(--text);
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 900px) {
+
+  .main-nav {
+    display: none;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .feature-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .content-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (max-width: 600px) {
+
+  .topbar {
+    padding: 13px 4%;
+  }
+
+  .brand {
+    font-size: 19px;
+  }
+
+  .add-book {
+    display: none;
+  }
+
+  .theme-button {
+    padding: 8px 10px;
+  }
+
+  .hero {
+    padding: 65px 5% 45px;
+  }
+
+  .hero h1 {
+    letter-spacing: -2px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-section {
+    padding-left: 4%;
+    padding-right: 4%;
+  }
+
+  .search-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-symbol {
+    display: none;
+  }
+
+  .search-box input,
+  .search-box select {
+    width: 100%;
+  }
+
+  .library-section {
+    padding-left: 4%;
+    padding-right: 4%;
+  }
+
+  .section-heading {
+    align-items: start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .book-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content-section {
+    padding: 65px 5%;
+  }
+
+  .content-card {
+    padding: 22px;
+  }
+
+  footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .reader-title {
+    display: none;
+  }
+
+  .reader-container {
+    width: 94%;
+    padding-top: 40px;
+  }
+
+  #readerContent {
+    padding: 32px 22px;
+
+    font-size: 17px;
+    line-height: 1.8;
+  }
+}

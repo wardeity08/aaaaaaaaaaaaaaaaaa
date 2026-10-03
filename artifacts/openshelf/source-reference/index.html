@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenShelf — Community Library</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+<header class="site-header">
+  <a class="brand" href="index.html">OpenShelf</a>
+
+  <div class="nav-actions">
+    <button class="theme-button" id="themeButton" type="button">
+      Theme
+    </button>
+
+    <div class="theme-menu" id="themeMenu">
+      <button class="theme-option" data-theme="light" type="button">
+        Light
+      </button>
+
+      <button class="theme-option" data-theme="cozy" type="button">
+        Cozy Library
+      </button>
+
+      <button class="theme-option" data-theme="cafe" type="button">
+        Café & Books
+      </button>
+
+      <button class="theme-option" data-theme="editorial" type="button">
+        Editorial
+      </button>
+    </div>
+  </div>
+</header>
+
+
+<main>
+
+  <!-- HERO -->
+
+  <section class="hero">
+
+    <div class="hero-content">
+
+      <p class="eyebrow">
+        A community-powered library
+      </p>
+
+      <h1>
+        Read something worth remembering.
+      </h1>
+
+      <p>
+        Discover books shared by readers and add your own.
+      </p>
+
+      <div class="search-wrap">
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search by title, author, or genre..."
+          autocomplete="off"
+        >
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- LIBRARY -->
+
+  <section class="library">
+
+    <div class="section-heading">
+
+      <div>
+        <p class="eyebrow">
+          Library
+        </p>
+
+        <h2>
+          Browse books
+        </h2>
+      </div>
+
+      <div class="library-controls">
+
+        <select id="genreFilter" class="genre-filter">
+          <option value="all">
+            All genres
+          </option>
+        </select>
+
+      </div>
+
+    </div>
+
+
+    <div id="bookGrid" class="book-grid"></div>
+
+
+    <div id="emptyState" class="empty-state" hidden>
+
+      <h3>
+        No books found
+      </h3>
+
+      <p>
+        Try another search or add the first book to the library.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <!-- ADD BOOK -->
+
+  <section class="upload-section">
+
+    <div class="section-heading">
+
+      <div>
+
+        <p class="eyebrow">
+          Contribute
+        </p>
+
+        <h2>
+          Add a book
+        </h2>
+
+      </div>
+
+    </div>
+
+
+    <form id="bookForm" class="upload-form">
+
+      <div class="form-row">
+
+        <label class="form-group">
+
+          <span>
+            Title
+          </span>
+
+          <input
+            id="bookTitle"
+            type="text"
+            required
+          >
+
+        </label>
+
+
+        <label class="form-group">
+
+          <span>
+            Author
+          </span>
+
+          <input
+            id="bookAuthor"
+            type="text"
+            required
+          >
+
+        </label>
+
+      </div>
+
+
+      <div class="form-row">
+
+        <label class="form-group">
+
+          <span>
+            Genre
+          </span>
+
+          <input
+            id="bookGenre"
+            type="text"
+            placeholder="Fiction, Mystery, Science..."
+            required
+          >
+
+        </label>
+
+
+        <label class="form-group">
+
+          <span>
+            Book file
+          </span>
+
+          <input
+            id="bookFile"
+            type="file"
+            accept="
+              .pdf,
+              .docx,
+              .epub,
+              .txt,
+              .rtf,
+              application/pdf,
+              application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+              application/epub+zip,
+              text/plain,
+              application/rtf
+            "
+            required
+          >
+
+        </label>
+
+      </div>
+
+
+      <label class="form-group">
+
+        <span>
+          Cover image
+        </span>
+
+        <input
+          id="coverFile"
+          type="file"
+          accept="image/*"
+          required
+        >
+
+      </label>
+
+
+      <p class="file-help">
+        Supported book formats:
+        PDF, DOCX, EPUB, TXT and RTF.
+      </p>
+
+
+      <button
+        class="submit-book-button"
+        type="submit"
+      >
+        Add to OpenShelf
+      </button>
+
+
+      <p
+        id="uploadStatus"
+        class="upload-status"
+        aria-live="polite"
+      ></p>
+
+    </form>
+
+  </section>
+
+</main>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>

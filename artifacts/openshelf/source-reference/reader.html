@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    OpenShelf Reader
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+  <!-- Supabase -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- DOCX -->
+
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js"></script>
+
+  <!-- EPUB -->
+
+  <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
+
+</head>
+
+
+<body class="reader-page">
+
+
+<header class="site-header reader-header">
+
+  <a
+    class="brand"
+    href="index.html"
+  >
+    OpenShelf
+  </a>
+
+
+  <div class="reader-actions">
+
+    <button
+      id="fontDecrease"
+      type="button"
+    >
+      A−
+    </button>
+
+
+    <button
+      id="fontReset"
+      type="button"
+    >
+      A
+    </button>
+
+
+    <button
+      id="fontIncrease"
+      type="button"
+    >
+      A+
+    </button>
+
+
+    <button
+      id="highlightButton"
+      type="button"
+    >
+      Highlight
+    </button>
+
+
+    <button
+      id="readerThemeButton"
+      type="button"
+    >
+      Theme
+    </button>
+
+
+    <div
+      class="theme-menu reader-theme-menu"
+      id="readerThemeMenu"
+    >
+
+      <button
+        class="reader-theme-option"
+        data-theme="light"
+        type="button"
+      >
+        Light
+      </button>
+
+
+      <button
+        class="reader-theme-option"
+        data-theme="cozy"
+        type="button"
+      >
+        Cozy Library
+      </button>
+
+
+      <button
+        class="reader-theme-option"
+        data-theme="cafe"
+        type="button"
+      >
+        Café & Books
+      </button>
+
+
+      <button
+        class="reader-theme-option"
+        data-theme="editorial"
+        type="button"
+      >
+        Editorial
+      </button>
+
+
+      <button
+        class="reader-theme-option"
+        data-theme="dark"
+        type="button"
+      >
+        Dark Reading
+      </button>
+
+    </div>
+
+
+    <a
+      class="back-button"
+      href="index.html"
+    >
+      Library
+    </a>
+
+  </div>
+
+</header>
+
+
+
+<main class="reader-main">
+
+
+  <!-- BOOK INFORMATION -->
+
+  <section class="reader-top">
+
+    <div>
+
+      <p class="eyebrow">
+        Now reading
+      </p>
+
+
+      <h1 id="bookTitle">
+        Loading...
+      </h1>
+
+
+      <p id="bookMeta"></p>
+
+    </div>
+
+
+    <div class="reader-tools">
+
+      <select
+        id="musicSelect"
+        aria-label="Background music"
+      >
+
+        <option value="none">
+          No music
+        </option>
+
+        <option value="rain">
+          Rain
+        </option>
+
+        <option value="piano">
+          Soft Piano
+        </option>
+
+        <option value="night">
+          Night
+        </option>
+
+        <option value="cafe">
+          Café
+        </option>
+
+      </select>
+
+
+      <button
+        id="musicToggle"
+        type="button"
+      >
+        Play music
+      </button>
+
+
+      <a
+        id="openOriginal"
+        href="#"
+        target="_blank"
+        rel="noopener"
+      >
+        Open original
+      </a>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- READING PROGRESS -->
+
+  <div class="reading-progress">
+
+    <div
+      id="readingProgressBar"
+    ></div>
+
+  </div>
+
+
+
+  <!-- READER -->
+
+  <section
+    id="readerShell"
+    class="reader-shell"
+  >
+
+    <div
+      id="readerContent"
+      class="reader-content"
+    >
+
+      <p class="loading-message">
+        Loading book...
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <p
+    id="readerMessage"
+    class="reader-message"
+  ></p>
+
+
+</main>
+
+
+
+<script>
+
+/* =========================================================
+   SUPABASE
+   ========================================================= */
+
+const SUPABASE_URL =
+  "https://kdycmaicayaesnpkqfgp.supabase.co";
+
+
+const SUPABASE_KEY =
+  "sb_publishable_LC_ZkgE8N9p_t6d7KIhC_w_437ZMCFH";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+
+/* =========================================================
+   BOOK ID
+   ========================================================= */
+
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+
+const bookId =
+  params.get("id");
+
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const readerContent =
+  document.getElementById(
+    "readerContent"
+  );
+
+
+const bookTitle =
+  document.getElementById(
+    "bookTitle"
+  );
+
+
+const bookMeta =
+  document.getElementById(
+    "bookMeta"
+  );
+
+
+const readerMessage =
+  document.getElementById(
+    "readerMessage"
+  );
+
+
+const openOriginal =
+  document.getElementById(
+    "openOriginal"
+  );
+
+
+const progressBar =
+  document.getElementById(
+    "readingProgressBar"
+  );
+
+
+
+let currentFontSize =
+  Number(
+    localStorage.getItem(
+      "openshelf-font-size"
+    )
+  ) || 18;
+
+
+let epubBook = null;
+
+let epubRendition = null;
+
+
+
+/* =========================================================
+   FILE EXTENSION
+   ========================================================= */
+
+function getExtension(url) {
+
+  const clean =
+    url
+      .split("?")[0]
+      .split("#")[0];
+
+
+  const filename =
+    clean.substring(
+      clean.lastIndexOf("/") + 1
+    );
+
+
+  const dot =
+    filename.lastIndexOf(".");
+
+
+  if (dot === -1) {
+    return "";
+  }
+
+
+  return filename
+    .slice(dot + 1)
+    .toLowerCase();
+
+}
+
+
+
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
+
+function escapeHtml(value = "") {
+
+  return String(value).replace(
+    /[&<>"']/g,
+    character => {
+
+      const map = {
+
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+
+      };
+
+      return map[character];
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+function setMessage(
+  message,
+  type = ""
+) {
+
+  readerMessage.textContent =
+    message;
+
+  readerMessage.className =
+    `reader-message ${type}`.trim();
+
+}
+
+
+
+/* =========================================================
+   READER THEMES
+   ========================================================= */
+
+function applyTheme(theme) {
+
+  const allowed = [
+
+    "light",
+    "cozy",
+    "cafe",
+    "editorial",
+    "dark"
+
+  ];
+
+
+  if (!allowed.includes(theme)) {
+
+    theme = "light";
+
+  }
+
+
+  document.body.dataset.theme =
+    theme;
+
+
+  localStorage.setItem(
+    "openshelf-reader-theme",
+    theme
+  );
+
+
+  document
+    .querySelectorAll(
+      ".reader-theme-option"
+    )
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.theme === theme
+      );
+
+    });
+
+
+  /* EPUB theme */
+
+  if (epubRendition) {
+
+    const dark =
+      theme === "dark";
+
+
+    epubRendition.themes.register(
+      "openshelf-theme",
+      {
+
+        body: {
+
+          color:
+            dark
+              ? "#eeeae2 !important"
+              : "#222 !important",
+
+          background:
+            dark
+              ? "#272727 !important"
+              : "#ffffff !important"
+
+        }
+
+      }
+    );
+
+
+    epubRendition.themes.select(
+      "openshelf-theme"
+    );
+
+  }
+
+}
+
+
+
+function initThemes() {
+
+  applyTheme(
+
+    localStorage.getItem(
+      "openshelf-reader-theme"
+    ) || "light"
+
+  );
+
+
+  const button =
+    document.getElementById(
+      "readerThemeButton"
+    );
+
+
+  const menu =
+    document.getElementById(
+      "readerThemeMenu"
+    );
+
+
+  button.addEventListener(
+    "click",
+    event => {
+
+      event.stopPropagation();
+
+      menu.classList.toggle(
+        "open"
+      );
+
+    }
+  );
+
+
+  document
+    .querySelectorAll(
+      ".reader-theme-option"
+    )
+    .forEach(option => {
+
+      option.addEventListener(
+        "click",
+        () => {
+
+          applyTheme(
+            option.dataset.theme
+          );
+
+          menu.classList.remove(
+            "open"
+          );
+
+        }
+      );
+
+    });
+
+
+  document.addEventListener(
+    "click",
+    event => {
+
+      if (
+        !menu.contains(
+          event.target
+        ) &&
+        event.target !== button
+      ) {
+
+        menu.classList.remove(
+          "open"
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   FONT SIZE
+   ========================================================= */
+
+function applyFontSize() {
+
+  localStorage.setItem(
+    "openshelf-font-size",
+    currentFontSize
+  );
+
+
+  readerContent.style
+    .setProperty(
+      "--reader-font-size",
+      `${currentFontSize}px`
+    );
+
+
+  readerContent
+    .querySelectorAll(
+      ".reader-text, .reader-text *"
+    )
+    .forEach(element => {
+
+      element.style.fontSize =
+        `${currentFontSize}px`;
+
+    });
+
+
+  if (epubRendition) {
+
+    epubRendition
+      .themes
+      .fontSize(
+        `${currentFontSize}px`
+      );
+
+  }
+
+}
+
+
+
+document
+  .getElementById(
+    "fontDecrease"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      currentFontSize =
+        Math.max(
+          12,
+          currentFontSize - 1
+        );
+
+      applyFontSize();
+
+    }
+  );
+
+
+
+document
+  .getElementById(
+    "fontReset"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      currentFontSize = 18;
+
+      applyFontSize();
+
+    }
+  );
+
+
+
+document
+  .getElementById(
+    "fontIncrease"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      currentFontSize =
+        Math.min(
+          34,
+          currentFontSize + 1
+        );
+
+      applyFontSize();
+
+    }
+  );
+
+
+
+/* =========================================================
+   HIGHLIGHT
+   ========================================================= */
+
+document
+  .getElementById(
+    "highlightButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      const selection =
+        window.getSelection();
+
+
+      if (
+        !selection ||
+        selection.rangeCount === 0 ||
+        selection.isCollapsed
+      ) {
+
+        setMessage(
+          "Select some text first, then press Highlight."
+        );
+
+        return;
+
+      }
+
+
+      const range =
+        selection.getRangeAt(0);
+
+
+      const mark =
+        document.createElement(
+          "mark"
+        );
+
+
+      try {
+
+        range.surroundContents(
+          mark
+        );
+
+        selection.removeAllRanges();
+
+      } catch {
+
+        setMessage(
+          "That selection cannot be highlighted."
+        );
+
+      }
+
+    }
+  );
+
+
+
+/* =========================================================
+   RTF → TEXT
+   ========================================================= */
+
+function rtfToPlainText(rtf) {
+
+  let text = rtf;
+
+
+  /* Hex characters */
+
+  text =
+    text.replace(
+      /\\'[0-9a-fA-F]{2}/g,
+      match =>
+        String.fromCharCode(
+          parseInt(
+            match.slice(2),
+            16
+          )
+        )
+    );
+
+
+  /* Paragraphs */
+
+  text =
+    text.replace(
+      /\\par[d]?/g,
+      "\n"
+    );
+
+
+  text =
+    text.replace(
+      /\\line/g,
+      "\n"
+    );
+
+
+  /* Tabs */
+
+  text =
+    text.replace(
+      /\\tab/g,
+      "\t"
+    );
+
+
+  /* Unicode */
+
+  text =
+    text.replace(
+      /\\u(-?\d+)\??/g,
+      (_, number) => {
+
+        const code =
+          Number(number);
+
+        return String.fromCharCode(
+          code < 0
+            ? code + 65536
+            : code
+        );
+
+      }
+    );
+
+
+  /* RTF commands */
+
+  text =
+    text.replace(
+      /\\[a-zA-Z]+-?\d* ?/g,
+      ""
+    );
+
+
+  /* Braces */
+
+  text =
+    text.replace(
+      /[{}]/g,
+      ""
+    );
+
+
+  return text
+    .replace(
+      /\n{3,}/g,
+      "\n\n"
+    )
+    .trim();
+
+}
+
+
+
+/* =========================================================
+   SIMPLE TEXT READER
+   ========================================================= */
+
+function showText(text) {
+
+  readerContent.innerHTML = "";
+
+
+  const article =
+    document.createElement(
+      "article"
+    );
+
+
+  article.className =
+    "reader-text";
+
+
+  article.textContent =
+    text;
+
+
+  readerContent.appendChild(
+    article
+  );
+
+
+  applyFontSize();
+
+}
+
+
+
+/* =========================================================
+   PDF
+   ========================================================= */
+
+async function renderPdf(url) {
+
+  readerContent.innerHTML = `
+
+    <iframe
+      class="pdf-reader"
+      src="${escapeHtml(url)}#toolbar=1&navpanes=0&view=FitH"
+      title="PDF reader"
+    ></iframe>
+
+  `;
+
+}
+
+
+
+/* =========================================================
+   DOCX
+   ========================================================= */
+
+async function renderDocx(url) {
+
+  const response =
+    await fetch(url);
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Could not download the DOCX file."
+    );
+
+  }
+
+
+  const arrayBuffer =
+    await response.arrayBuffer();
+
+
+  const result =
+    await mammoth.convertToHtml({
+      arrayBuffer
+    });
+
+
+  readerContent.innerHTML = `
+
+    <article class="reader-text docx-content">
+
+      ${result.value}
+
+    </article>
+
+  `;
+
+
+  applyFontSize();
+
+
+  if (
+    result.messages &&
+    result.messages.length
+  ) {
+
+    console.warn(
+      "DOCX conversion messages:",
+      result.messages
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   TXT
+   ========================================================= */
+
+async function renderTxt(url) {
+
+  const response =
+    await fetch(url);
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Could not download the TXT file."
+    );
+
+  }
+
+
+  const text =
+    await response.text();
+
+
+  showText(text);
+
+}
+
+
+
+/* =========================================================
+   RTF
+   ========================================================= */
+
+async function renderRtf(url) {
+
+  const response =
+    await fetch(url);
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Could not download the RTF file."
+    );
+
+  }
+
+
+  const rtf =
+    await response.text();
+
+
+  const readable =
+    rtfToPlainText(rtf);
+
+
+  showText(readable);
+
+}
+
+
+
+/* =========================================================
+   EPUB
+   ========================================================= */
+
+async function renderEpub(url) {
+
+  readerContent.innerHTML = `
+
+    <div
+      id="epubReader"
+      class="epub-reader"
+    ></div>
+
+  `;
+
+
+  epubBook =
+    ePub(url);
+
+
+  epubRendition =
+    epubBook.renderTo(
+      "epubReader",
+      {
+
+        width: "100%",
+        height: "100%",
+        spread: "none"
+
+      }
+    );
+
+
+  await epubRendition.display();
+
+
+  epubRendition
+    .themes
+    .fontSize(
+      `${currentFontSize}px`
+    );
+
+
+  applyTheme(
+
+    localStorage.getItem(
+      "openshelf-reader-theme"
+    ) || "light"
+
+  );
+
+}
+
+
+
+/* =========================================================
+   FORMAT DISPATCHER
+   ========================================================= */
+
+async function openBookFile(url) {
+
+  const extension =
+    getExtension(url);
+
+
+  if (extension === "pdf") {
+
+    return renderPdf(url);
+
+  }
+
+
+  if (extension === "docx") {
+
+    return renderDocx(url);
+
+  }
+
+
+  if (extension === "epub") {
+
+    return renderEpub(url);
+
+  }
+
+
+  if (extension === "txt") {
+
+    return renderTxt(url);
+
+  }
+
+
+  if (extension === "rtf") {
+
+    return renderRtf(url);
+
+  }
+
+
+  throw new Error(
+    "Unsupported book format. Supported formats: PDF, DOCX, EPUB, TXT and RTF."
+  );
+
+}
+
+
+
+/* =========================================================
+   LOAD BOOK FROM SUPABASE
+   ========================================================= */
+
+async function loadBook() {
+
+  if (!bookId) {
+
+    bookTitle.textContent =
+      "Book not found";
+
+    setMessage(
+      "No book ID was provided.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const {
+    data: book,
+    error
+  } = await supabaseClient
+
+    .from("books")
+
+    .select("*")
+
+    .eq(
+      "id",
+      bookId
+    )
+
+    .single();
+
+
+  if (
+    error ||
+    !book
+  ) {
+
+    console.error(error);
+
+
+    bookTitle.textContent =
+      "Book not found";
+
+
+    readerContent.innerHTML =
+      "";
+
+
+    setMessage(
+      "This book could not be loaded.",
+      "error"
+    );
+
+
+    return;
+
+  }
+
+
+  /* Book information */
+
+  bookTitle.textContent =
+    book.title ||
+    "Untitled";
+
+
+  bookMeta.textContent =
+    `${book.author || "Unknown author"}${
+      book.genre
+        ? " · " + book.genre
+        : ""
+    }`;
+
+
+  /* Original file */
+
+  openOriginal.href =
+    book.book_url;
+
+
+  try {
+
+    await openBookFile(
+      book.book_url
+    );
+
+
+    applyFontSize();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    readerContent.innerHTML =
+      "";
+
+
+    setMessage(
+      `Could not open this book: ${
+        error.message ||
+        "Unknown error"
+      }`,
+      "error"
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   READING PROGRESS
+   ========================================================= */
+
+function updateProgress() {
+
+  const scrollable =
+    document.documentElement
+      .scrollHeight -
+    window.innerHeight;
+
+
+  if (scrollable <= 0) {
+
+    progressBar.style.width =
+      "100%";
+
+    return;
+
+  }
+
+
+  const percent =
+    Math.min(
+      100,
+      Math.max(
+        0,
+        (
+          window.scrollY /
+          scrollable
+        ) * 100
+      )
+    );
+
+
+  progressBar.style.width =
+    `${percent}%`;
+
+}
+
+
+window.addEventListener(
+  "scroll",
+  updateProgress
+);
+
+
+
+/* =========================================================
+   BACKGROUND MUSIC
+   ========================================================= */
+
+let audioContext = null;
+
+let masterGain = null;
+
+let musicTimer = null;
+
+let musicRunning = false;
+
+
+
+function ensureAudio() {
+
+  if (!audioContext) {
+
+    audioContext =
+      new (
+        window.AudioContext ||
+        window.webkitAudioContext
+      )();
+
+
+    masterGain =
+      audioContext.createGain();
+
+
+    masterGain.gain.value =
+      0.045;
+
+
+    masterGain.connect(
+      audioContext.destination
+    );
+
+  }
+
+
+  if (
+    audioContext.state ===
+    "suspended"
+  ) {
+
+    audioContext.resume();
+
+  }
+
+}
+
+
+
+function stopMusic() {
+
+  if (musicTimer) {
+
+    clearInterval(
+      musicTimer
+    );
+
+    musicTimer = null;
+
+  }
+
+
+  musicRunning = false;
+
+
+  document.getElementById(
+    "musicToggle"
+  ).textContent =
+    "Play music";
+
+}
+
+
+
+/* ---------- Rain ---------- */
+
+function createRain() {
+
+  const bufferSize =
+    audioContext.sampleRate * 2;
+
+
+  const buffer =
+    audioContext.createBuffer(
+      1,
+      bufferSize,
+      audioContext.sampleRate
+    );
+
+
+  const data =
+    buffer.getChannelData(0);
+
+
+  for (
+    let i = 0;
+    i < bufferSize;
+    i++
+  ) {
+
+    data[i] =
+      (
+        Math.random() * 2 - 1
+      ) * 0.25;
+
+  }
+
+
+  const source =
+    audioContext.createBufferSource();
+
+
+  const filter =
+    audioContext.createBiquadFilter();
+
+
+  const gain =
+    audioContext.createGain();
+
+
+  source.buffer =
+    buffer;
+
+
+  source.loop = true;
+
+
+  filter.type =
+    "lowpass";
+
+
+  filter.frequency.value =
+    3200;
+
+
+  gain.gain.value =
+    0.18;
+
+
+  source
+    .connect(filter)
+    .connect(gain)
+    .connect(masterGain);
+
+
+  source.start();
+
+
+  return source;
+
+}
+
+
+
+/* ---------- Night ---------- */
+
+function createDrone() {
+
+  const oscillator =
+    audioContext.createOscillator();
+
+
+  const gain =
+    audioContext.createGain();
+
+
+  oscillator.type =
+    "sine";
+
+
+  oscillator.frequency.value =
+    110;
+
+
+  gain.gain.value =
+    0.08;
+
+
+  oscillator
+    .connect(gain)
+    .connect(masterGain);
+
+
+  oscillator.start();
+
+
+  return oscillator;
+
+}
+
+
+
+/* ---------- Start ---------- */
+
+function startMusic(type) {
+
+  ensureAudio();
+
+  stopMusic();
+
+
+  if (type === "none") {
+
+    return;
+
+  }
+
+
+  /* Rain */
+
+  if (type === "rain") {
+
+    createRain();
+
+    musicRunning = true;
+
+  }
+
+
+  /* Night */
+
+  if (type === "night") {
+
+    createDrone();
+
+    musicRunning = true;
+
+  }
+
+
+  /* Piano / Café */
+
+  if (
+    type === "piano" ||
+    type === "cafe"
+  ) {
+
+    const notes =
+      type === "piano"
+
+        ? [
+            261.63,
+            329.63,
+            392.00,
+            329.63
+          ]
+
+        : [
+            196.00,
+            246.94,
+            293.66,
+            246.94
+          ];
+
+
+    let index = 0;
+
+
+    function playNote() {
+
+      const oscillator =
+        audioContext
+          .createOscillator();
+
+
+      const gain =
+        audioContext
+          .createGain();
+
+
+      oscillator.type =
+        type === "piano"
+          ? "triangle"
+          : "sine";
+
+
+      oscillator.frequency.value =
+        notes[
+          index %
+          notes.length
+        ];
+
+
+      gain.gain.setValueAtTime(
+        0.0001,
+        audioContext.currentTime
+      );
+
+
+      gain.gain.exponentialRampToValueAtTime(
+        type === "piano"
+          ? 0.16
+          : 0.08,
+        audioContext.currentTime +
+          0.03
+      );
+
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        audioContext.currentTime +
+          1.4
+      );
+
+
+      oscillator
+        .connect(gain)
+        .connect(masterGain);
+
+
+      oscillator.start();
+
+
+      oscillator.stop(
+        audioContext.currentTime +
+        1.45
+      );
+
+
+      index++;
+
+    }
+
+
+    playNote();
+
+
+    musicTimer =
+      setInterval(
+        playNote,
+        type === "piano"
+          ? 1500
+          : 1000
+      );
+
+
+    musicRunning = true;
+
+  }
+
+
+  document.getElementById(
+    "musicToggle"
+  ).textContent =
+    "Stop music";
+
+}
+
+
+
+/* =========================================================
+   MUSIC EVENTS
+   ========================================================= */
+
+document
+  .getElementById(
+    "musicSelect"
+  )
+  .addEventListener(
+    "change",
+    event => {
+
+      startMusic(
+        event.target.value
+      );
+
+    }
+  );
+
+
+
+document
+  .getElementById(
+    "musicToggle"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      const select =
+        document.getElementById(
+          "musicSelect"
+        );
+
+
+      if (musicRunning) {
+
+        stopMusic();
+
+      } else {
+
+        startMusic(
+          select.value
+        );
+
+      }
+
+    }
+  );
+
+
+
+/* =========================================================
+   START READER
+   ========================================================= */
+
+initThemes();
+
+loadBook();
+
+</script>
+
+</body>
+</html>
