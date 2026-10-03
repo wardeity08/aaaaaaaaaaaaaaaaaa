@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type CSSProperties, type FormEvent } from 'react';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, FileText, ImagePlus, Library, LoaderCircle, Search, Sun, Upload, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, FileText, ImagePlus, Library, LoaderCircle, Music2, Pause, Play, Search, Sun, Upload, Volume2, X } from 'lucide-react';
 import { Route, Switch } from 'wouter';
 
 const SUPABASE_URL = 'https://kdycmaicayaesnpkqfgp.supabase.co';
@@ -26,12 +26,10 @@ const themes: ThemeOption[] = [
   { id: 'cozy', name: 'Cozy', note: 'Soft afternoon' },
   { id: 'cafe', name: 'Café', note: 'A little warmth' },
   { id: 'editorial', name: 'Editorial', note: 'Ink & parchment' },
+  { id: 'dark', name: 'Dark Reading', note: 'Low light, easy reading' },
 ];
 
-const readerThemes: ThemeOption[] = [
-  ...themes,
-  { id: 'dark', name: 'Dark Reading', note: 'A softer page for night' },
-];
+const readerThemes = themes;
 
 function useTheme(storageKey = 'openshelf-theme', options: ThemeOption[] = themes) {
   const [theme, setTheme] = useState(() => {
@@ -238,14 +236,16 @@ function ReaderPage() {
   const [message, setMessage] = useState('');
   const [fontSize, setFontSize] = useState(() => Number(localStorage.getItem('openshelf-font-size')) || 18);
   const [formatContent, setFormatContent] = useState<{ html?: string; text?: string } | null>(null);
-  const [music, setMusic] = useState('none');
+  const [musicFileName, setMusicFileName] = useState('');
   const [musicPlaying, setMusicPlaying] = useState(false);
+  const [musicVolume, setMusicVolume] = useState(0.35);
+  const [musicStatus, setMusicStatus] = useState('');
   const contentRef = useRef<HTMLDivElement>(null);
   const epubContainerRef = useRef<HTMLDivElement>(null);
   const epubRendition = useRef<any>(null);
-  const audioContext = useRef<AudioContext | null>(null);
-  const audioNodes = useRef<AudioScheduledSourceNode[]>([]);
-  const musicTimer = useRef<number | null>(null);
+  const musicFileInputRef = useRef<HTMLInputElement>(null);
+  const musicAudioRef = useRef<HTMLAudioElement>(null);
+  const musicObjectUrlRef = useRef<string | null>(null);
   const id = new URLSearchParams(window.location.search).get('id');
   useEffect(() => {
     let active = true;
@@ -330,65 +330,79 @@ function ReaderPage() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => () => stopAmbientMusic(), []);
+  useEffect(() => () => {
+    musicAudioRef.current?.pause();
+    if (musicObjectUrlRef.current) URL.revokeObjectURL(musicObjectUrlRef.current);
+  }, []);
 
-  function stopAmbientMusic() {
-    if (musicTimer.current !== null) window.clearInterval(musicTimer.current);
-    musicTimer.current = null;
-    audioNodes.current.forEach((node) => { try { node.stop(); } catch { /* already stopped */ } });
-    audioNodes.current = [];
-    setMusicPlaying(false);
-  }
+  function handleMusicFile(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file) return;
 
-  function startAmbientMusic(kind: string) {
-    stopAmbientMusic();
-    if (kind === 'none') return;
-    const Context = window.AudioContext;
-    if (!Context) { setMessage('Background audio is not supported in this browser.'); return; }
-    const context = audioContext.current || new Context();
-    audioContext.current = context;
-    void context.resume();
-    const master = context.createGain();
-    master.gain.value = 0.045;
-    master.connect(context.destination);
-    const playTone = (hz: number, wave: OscillatorType) => {
-      const osc = context.createOscillator();
-      const gain = context.createGain();
-      osc.type = wave;
-      osc.frequency.value = hz;
-      gain.gain.setValueAtTime(0.0001, context.currentTime);
-      gain.gain.exponentialRampToValueAtTime(kind === 'piano' ? 0.16 : 0.08, context.currentTime + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 1.4);
-      osc.connect(gain).connect(master);
-      osc.start();
-      osc.stop(context.currentTime + 1.45);
-      audioNodes.current.push(osc);
-    };
-    if (kind === 'rain') {
-      const buffer = context.createBuffer(1, context.sampleRate * 2, context.sampleRate);
-      const channel = buffer.getChannelData(0);
-      for (let i = 0; i < channel.length; i += 1) channel[i] = (Math.random() * 2 - 1) * 0.25;
-      const source = context.createBufferSource();
-      const filter = context.createBiquadFilter();
-      const gain = context.createGain();
-      source.buffer = buffer; source.loop = true; filter.type = 'lowpass'; filter.frequency.value = 3200; gain.gain.value = 0.18;
-      source.connect(filter).connect(gain).connect(master); source.start(); audioNodes.current.push(source);
-    } else if (kind === 'night') {
-      const drone = context.createOscillator(); const gain = context.createGain();
-      drone.type = 'sine'; drone.frequency.value = 110; gain.gain.value = 0.08;
-      drone.connect(gain).connect(master); drone.start(); audioNodes.current.push(drone);
-    } else {
-      const notes = kind === 'piano' ? [261.63, 329.63, 392, 329.63] : [196, 246.94, 293.66, 246.94];
-      let index = 0;
-      playTone(notes[index++ % notes.length], kind === 'piano' ? 'triangle' : 'sine');
-      musicTimer.current = window.setInterval(() => playTone(notes[index++ % notes.length], kind === 'piano' ? 'triangle' : 'sine'), kind === 'piano' ? 1500 : 1000);
+    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+    const supportedAudio = ['mp3', 'm4a', 'mp4', 'wav', 'ogg', 'opus', 'flac', 'aac', 'webm'].includes(extension);
+    if (!file.type.startsWith('audio/') && !supportedAudio) {
+      setMusicStatus('Choose an audio file such as MP3, M4A, WAV, or OGG.');
+      return;
     }
-    setMusicPlaying(true);
+
+    const player = musicAudioRef.current;
+    if (!player) return;
+    player.pause();
+    const objectUrl = URL.createObjectURL(file);
+    if (musicObjectUrlRef.current) URL.revokeObjectURL(musicObjectUrlRef.current);
+    musicObjectUrlRef.current = objectUrl;
+    player.src = objectUrl;
+    player.loop = true;
+    player.volume = musicVolume;
+    player.load();
+    setMusicFileName(file.name);
+    setMusicStatus('');
+    void player.play().catch(() => {
+      setMusicPlaying(false);
+      setMusicStatus('This file could not be played. Try another audio file.');
+    });
   }
 
-  function toggleMusic() {
-    if (musicPlaying) stopAmbientMusic();
-    else startAmbientMusic(music);
+  async function toggleMusic() {
+    const player = musicAudioRef.current;
+    if (!musicFileName) {
+      musicFileInputRef.current?.click();
+      return;
+    }
+    if (!player) return;
+    if (player.paused) {
+      try {
+        await player.play();
+        setMusicStatus('');
+      } catch {
+        setMusicStatus('This file could not be played. Try another audio file.');
+      }
+    } else {
+      player.pause();
+    }
+  }
+
+  function removeMusic() {
+    const player = musicAudioRef.current;
+    player?.pause();
+    if (player) {
+      player.removeAttribute('src');
+      player.load();
+    }
+    if (musicObjectUrlRef.current) URL.revokeObjectURL(musicObjectUrlRef.current);
+    musicObjectUrlRef.current = null;
+    setMusicFileName('');
+    setMusicPlaying(false);
+    setMusicStatus('');
+  }
+
+  function changeMusicVolume(event: ChangeEvent<HTMLInputElement>) {
+    const volume = Number(event.currentTarget.value);
+    setMusicVolume(volume);
+    if (musicAudioRef.current) musicAudioRef.current.volume = volume;
   }
 
   function highlightSelection() {
@@ -415,10 +429,24 @@ function ReaderPage() {
           <div className="reader-tools">
             <div className="reader-control-group"><button id="fontDecrease" type="button" onClick={() => setFontSize((size) => Math.max(12, size - 1))} aria-label="Decrease font size" data-testid="button-font-decrease">A−</button><button id="fontReset" type="button" onClick={() => setFontSize(18)} aria-label="Reset font size" data-testid="button-font-reset">A</button><button id="fontIncrease" type="button" onClick={() => setFontSize((size) => Math.min(34, size + 1))} aria-label="Increase font size" data-testid="button-font-increase">A+</button></div>
             <button id="highlightButton" type="button" onClick={highlightSelection} data-testid="button-highlight">Highlight</button>
-            <select id="musicSelect" aria-label="Background music" value={music} onChange={(event) => { setMusic(event.target.value); if (musicPlaying) startAmbientMusic(event.target.value); }} className="audio-select" data-testid="select-background-music"><option value="none">No music</option><option value="rain">Rain</option><option value="piano">Soft Piano</option><option value="night">Night</option><option value="cafe">Café</option></select>
-            <button id="musicToggle" type="button" onClick={toggleMusic} data-testid="button-toggle-music">{musicPlaying ? 'Stop music' : 'Play music'}</button>
             <a id="openOriginal" href={book.book_url} target="_blank" rel="noopener noreferrer" data-testid="link-open-original">Open original <ArrowRight size={13} /></a>
           </div>
+          <input ref={musicFileInputRef} className="reader-music-file-input" type="file" accept="audio/*,.mp3,.m4a,.wav,.ogg,.opus,.flac,.aac,.webm" onChange={handleMusicFile} aria-label="Choose a music file" data-testid="input-reader-music" />
+          <audio ref={musicAudioRef} preload="none" onPlay={() => setMusicPlaying(true)} onPause={() => setMusicPlaying(false)} onError={() => { if (musicFileName) { setMusicPlaying(false); setMusicStatus('This file could not be played. Try another audio file.'); } }} />
+          <section className="reader-music-panel" aria-label="Personal reading music">
+            <span className="reader-music-icon"><Music2 size={20} /></span>
+            <div className="reader-music-copy"><span className="eyebrow">YOUR SOUNDTRACK</span><strong title={musicFileName || undefined}>{musicFileName || 'Bring your own sound'}</strong><small role={musicStatus ? 'status' : undefined}>{musicStatus || (musicFileName ? 'Playing from this device · loops while you read' : 'Choose an audio file from this device. It stays private.')}</small></div>
+            <div className="reader-music-controls">
+              <button type="button" className="reader-music-primary" onClick={() => { if (musicFileName) void toggleMusic(); else musicFileInputRef.current?.click(); }} data-testid="button-reader-music">
+                {musicFileName ? musicPlaying ? <><Pause size={15} /> Pause</> : <><Play size={15} /> Play</> : <><Upload size={15} /> Add your music</>}
+              </button>
+              {musicFileName && <>
+                <button type="button" className="reader-music-icon-button" onClick={() => musicFileInputRef.current?.click()} aria-label="Replace music file" title="Replace music" data-testid="button-replace-music"><Upload size={15} /></button>
+                <label className="reader-volume" aria-label="Music volume"><Volume2 size={15} /><input type="range" min="0" max="1" step="0.05" value={musicVolume} onChange={changeMusicVolume} aria-label="Music volume" data-testid="input-music-volume" /></label>
+                <button type="button" className="reader-music-icon-button" onClick={removeMusic} aria-label="Remove music file" title="Remove music" data-testid="button-remove-music"><X size={15} /></button>
+              </>}
+            </div>
+          </section>
           {message && <p className="reader-status" role="status" data-testid="status-reader">{message}</p>}
           <section className="reader-content-shell"><div className="reading-progress"><div className="reading-progress-bar" /></div><div ref={contentRef} className="reader-content" style={{ fontSize: `${fontSize}px`, '--reader-font-size': `${fontSize}px` } as CSSProperties}>{displayedFile || (message ? <div className="reader-file-error">The book could not be opened.</div> : <p className="loading-message">Loading book…</p>)}</div></section>
         </>}
