@@ -2,6 +2,9 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent, type CSSPropert
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, FileText, ImagePlus, Library, LoaderCircle, Music2, Pause, Play, Search, Sun, Upload, Volume2, X } from 'lucide-react';
 import { Route, Switch } from 'wouter';
+import { useQueryClient } from '@tanstack/react-query';
+import { getListBookReviewsQueryKey, useCreateBookReview, useListBookReviews } from '@workspace/api-client-react';
+import { Star } from 'lucide-react';
 
 const SUPABASE_URL = 'https://kdycmaicayaesnpkqfgp.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_LC_ZkgE8N9p_t6d7KIhC_w_437ZMCFH';
@@ -45,14 +48,61 @@ function useTheme(storageKey = 'openshelf-theme', options: ThemeOption[] = theme
 }
 
 function Brand() {
-  return <a className="brand-mark" href="/" aria-label="OpenShelf home"><span className="brand-icon"><svg className="brand-books-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <rect x="1.5" y="8" width="3.6" height="13" rx="1" fill="currentColor" opacity=".66" />
-    <rect x="5.6" y="4.5" width="3.8" height="16.5" rx="1" fill="currentColor" />
-    <rect x="9.9" y="6.5" width="3.4" height="14.5" rx="1" fill="var(--accent-2)" />
-    <rect x="13.7" y="3" width="4.1" height="18" rx="1" fill="currentColor" />
-    <rect x="18.3" y="9" width="4.2" height="12" rx="1" fill="currentColor" opacity=".72" />
-    <path d="M2.4 11h1.8M6.6 8h1.8M10.7 10h1.8M14.8 6.6h1.9M19.3 12h2" stroke="var(--surface)" strokeWidth=".7" strokeLinecap="round" opacity=".82" />
-  </svg></span><span>open<span className="brand-light">shelf</span></span></a>;
+  return <a className="brand-mark" href="/" aria-label="OpenShelf home"><span className="brand-icon"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M5 25V8.5L16 4l11 4.5V25l-11-4.2L5 25Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/><path d="M16 9v11.8M9 11.2v8.4M23 11.2v8.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/><circle cx="16" cy="26.5" r="1.3" fill="var(--accent-2)"/></svg></span><span>open<span className="brand-light">shelf</span></span></a>;
+}
+
+function CommunityReviews({ bookId }: { bookId: string }) {
+  const queryClient = useQueryClient();
+  const { data, isLoading, isError, refetch } = useListBookReviews(bookId, {
+    query: { enabled: Boolean(bookId), queryKey: getListBookReviewsQueryKey(bookId) },
+  });
+  const createReview = useCreateBookReview();
+  const [rating, setRating] = useState(0);
+  const [reviewerName, setReviewerName] = useState('');
+  const [comment, setComment] = useState('');
+  const [hoverRating, setHoverRating] = useState(0);
+  const [submitError, setSubmitError] = useState('');
+  function submitReview(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitError('');
+    if (!rating) { setSubmitError('Choose a star rating before sharing your note.'); return; }
+    if (!comment.trim()) { setSubmitError('Add a comment before sharing your note.'); return; }
+    createReview.mutate({ bookId, data: { reviewerName: reviewerName.trim(), rating, comment: comment.trim() } }, {
+      onSuccess: async () => {
+        setRating(0); setReviewerName(''); setComment('');
+        await queryClient.invalidateQueries({ queryKey: getListBookReviewsQueryKey(bookId) });
+      },
+      onError: (error) => setSubmitError(error instanceof Error ? error.message : 'Your review could not be sent. Please try again.'),
+    });
+  }
+  return <section className="community-reviews" aria-labelledby="reviews-title" data-testid="section-community-reviews">
+    <div className="review-intro">
+      <span className="eyebrow">AFTER THE LAST PAGE</span><h2 id="reviews-title">Leave a little note.</h2>
+      <p>Stories travel further when readers tell us what stayed with them.</p>
+      <div className="review-summary" data-testid="review-summary">
+        <strong>{data?.reviewCount ? data.averageRating.toFixed(1) : '—'}</strong>
+        <span className="summary-stars" aria-label={data?.reviewCount ? `${data.averageRating.toFixed(1)} out of 5 stars` : 'No ratings yet'}>{[1,2,3,4,5].map((star) => <Star key={star} size={15} fill={data?.reviewCount && star <= Math.round(data.averageRating) ? 'currentColor' : 'none'} />)}</span>
+        <small>{data?.reviewCount ?? 0} {data?.reviewCount === 1 ? 'reader' : 'readers'}</small>
+      </div>
+    </div>
+    <div className="review-columns">
+      <form className="review-form" onSubmit={submitReview} data-testid="form-book-review">
+        <h3>Your two cents</h3><p className="review-form-note">No account needed. Your comment is public.</p>
+        <fieldset className="rating-field"><legend>Your rating <span aria-hidden="true">*</span></legend><div className="rating-buttons" onMouseLeave={() => setHoverRating(0)}>{[1,2,3,4,5].map((star) => <button key={star} type="button" aria-label={`${star} star${star === 1 ? '' : 's'}`} aria-pressed={rating === star} onMouseEnter={() => setHoverRating(star)} onClick={() => setRating(star)} data-testid={`button-rating-${star}`}><Star size={24} fill={star <= (hoverRating || rating) ? 'currentColor' : 'none'} /></button>)}</div></fieldset>
+        <label className="review-label">Display name <span>optional</span><input value={reviewerName} onChange={(event) => setReviewerName(event.target.value)} maxLength={80} placeholder="Reader" data-testid="input-reviewer-name" /></label>
+        <label className="review-label">Your note<textarea value={comment} onChange={(event) => setComment(event.target.value)} required minLength={1} maxLength={2000} rows={4} placeholder="What would you tell the next reader?" data-testid="input-review-comment" /></label>
+        {submitError && <p className="review-error" role="alert" data-testid="error-review-submit">{submitError}</p>}
+        {createReview.isSuccess && !submitError && <p className="review-success" role="status" data-testid="status-review-submit">Your note is on the shelf. Thank you.</p>}
+        <button className="button-primary review-submit" type="submit" disabled={createReview.isPending} data-testid="button-submit-review">{createReview.isPending ? 'Sharing your note…' : 'Share your note'} <ArrowRight size={16}/></button>
+      </form>
+      <div className="review-list" data-testid="review-list">
+        {isLoading ? <div className="review-loading" aria-label="Loading reader notes">{[1,2].map((n) => <div className="review-skeleton" key={n}><i/><i/><i/></div>)}</div>
+          : isError ? <div className="review-empty review-fetch-error" role="alert"><h3>Notes are out of reach.</h3><p>We couldn’t load the community reviews right now.</p><button className="button-secondary" type="button" onClick={() => void refetch()} data-testid="button-retry-reviews">Try again</button></div>
+          : data?.reviews.length ? <>{data.reviews.map((review) => <article className="review-item" key={review.id} data-testid={`review-${review.id}`}><div className="review-item-top"><strong>{review.reviewerName || 'Reader'}</strong><time dateTime={review.createdAt}>{new Date(review.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</time></div><div className="review-item-stars" aria-label={`${review.rating} out of 5 stars`}>{[1,2,3,4,5].map((star) => <Star key={star} size={13} fill={star <= review.rating ? 'currentColor' : 'none'} />)}</div><p>{review.comment}</p></article>)}</>
+          : <div className="review-empty" data-testid="empty-reviews"><span className="review-empty-mark">01</span><h3>A fresh page.</h3><p>No notes yet. Be the first neighbor to leave one.</p></div>}
+      </div>
+    </div>
+  </section>;
 }
 
 function ThemePicker({ theme, onChange, options = themes }: { theme: string; onChange: (theme: string) => void; options?: ThemeOption[] }) {
@@ -231,7 +281,7 @@ function LibraryPage() {
           <p className="privacy-note">Shared with readers in this little library.</p>
         </form>
       </section>
-      <footer className="page-footer"><Brand /><span>Pass a good story along.</span><a href="#collection">Back to shelves <ArrowRight size={14} /></a></footer>
+      <footer className="page-footer"><Brand /><span>Pass a good story along.</span><span className="footer-credit">Developed by Nikender Singh</span><a href="#collection">Back to shelves <ArrowRight size={14} /></a></footer>
     </div>
   </main>;
 }
@@ -457,7 +507,9 @@ function ReaderPage() {
           </section>
           {message && <p className="reader-status" role="status" data-testid="status-reader">{message}</p>}
           <section className="reader-content-shell"><div className="reading-progress"><div className="reading-progress-bar" /></div><div ref={contentRef} className="reader-content" style={{ fontSize: `${fontSize}px`, '--reader-font-size': `${fontSize}px` } as CSSProperties}>{displayedFile || (message ? <div className="reader-file-error">The book could not be opened.</div> : <p className="loading-message">Loading book…</p>)}</div></section>
+          <CommunityReviews bookId={String(book.id)} />
         </>}
+    <footer className="reader-footer"><Brand /><span>Developed by Nikender Singh</span><a href="/">Back to the shelves <ArrowRight size={14} /></a></footer>
   </main>;
 }
 

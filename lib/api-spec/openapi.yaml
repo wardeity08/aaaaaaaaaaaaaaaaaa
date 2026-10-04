@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: books
+    description: Community book reviews
 paths:
   /healthz:
     get:
@@ -24,6 +26,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /books/{bookId}/reviews:
+    parameters:
+      - name: bookId
+        in: path
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 200
+    get:
+      operationId: listBookReviews
+      tags: [books]
+      summary: List public reviews for a book
+      responses:
+        "200":
+          description: Review list and rating summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookReviewList"
+    post:
+      operationId: createBookReview
+      tags: [books]
+      summary: Add a public review for a book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewInput"
+      responses:
+        "201":
+          description: Created review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookReview"
+        "400":
+          description: Review input is invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +78,71 @@ components:
           type: string
       required:
         - status
+    BookReview:
+      type: object
+      properties:
+        id:
+          type: integer
+        bookId:
+          type: string
+        reviewerName:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - bookId
+        - reviewerName
+        - rating
+        - comment
+        - createdAt
+    BookReviewList:
+      type: object
+      properties:
+        bookId:
+          type: string
+        averageRating:
+          type: number
+        reviewCount:
+          type: integer
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/BookReview"
+      required:
+        - bookId
+        - averageRating
+        - reviewCount
+        - reviews
+    ReviewInput:
+      type: object
+      properties:
+        reviewerName:
+          type: string
+          maxLength: 80
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          minLength: 1
+          maxLength: 2000
+      required:
+        - rating
+        - comment
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
 

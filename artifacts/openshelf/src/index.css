@@ -714,3 +714,186 @@ body[data-theme='gallery'] .button-secondary:focus-visible {
   body[data-theme='gallery'] .illustration-books { transform:scale(.38); transform-origin:bottom right; right:5%; bottom:6px; }
   body[data-theme='gallery'] .shelf-line { bottom:5px; }
 }
+
+/* OpenShelf reimagined — independent-bookshop editorial system */
+:root {
+  --background: 39 35% 92%; --foreground: 157 18% 19%; --border: 34 22% 77%;
+  --card: 40 38% 96%; --card-foreground: 157 18% 19%; --card-border: 34 22% 77%;
+  --sidebar: 39 35% 92%; --sidebar-foreground: 157 18% 19%; --sidebar-border: 34 22% 77%;
+  --sidebar-primary: 157 29% 27%; --sidebar-primary-foreground: 40 38% 96%; --sidebar-accent: 34 29% 84%; --sidebar-accent-foreground: 157 18% 19%; --sidebar-ring: 157 29% 27%;
+  --popover: 40 38% 96%; --popover-foreground: 157 18% 19%; --popover-border: 34 22% 77%;
+  --primary: 157 29% 27%; --primary-foreground: 40 38% 96%; --secondary: 34 29% 84%; --secondary-foreground: 157 18% 19%;
+  --muted: 35 26% 86%; --muted-foreground: 153 9% 42%; --accent: 12 48% 55%; --accent-foreground: 40 38% 96%;
+  --destructive: 5 59% 46%; --destructive-foreground: 40 38% 96%; --input: 34 22% 77%; --ring: 157 29% 27%;
+  --chart-1: 157 29% 27%; --chart-2: 12 48% 55%; --chart-3: 44 56% 59%; --chart-4: 197 24% 50%; --chart-5: 334 32% 52%;
+  --app-font-sans: 'DM Sans', sans-serif; --app-font-serif: 'Fraunces', Georgia, serif; --app-font-mono: 'DM Mono', monospace;
+  --radius: .25rem; --shadow: 0 18px 50px rgba(35,47,39,.11);
+}
+.dark {
+  --background: 157 18% 13%; --foreground: 39 34% 90%; --border: 154 10% 29%; --card: 157 16% 17%;
+  --card-foreground: 39 34% 90%; --card-border: 154 10% 29%; --sidebar: 157 18% 13%; --sidebar-foreground: 39 34% 90%;
+  --sidebar-border: 154 10% 29%; --sidebar-primary: 40 49% 65%; --sidebar-primary-foreground: 157 18% 13%;
+  --sidebar-accent: 155 13% 23%; --sidebar-accent-foreground: 39 34% 90%; --sidebar-ring: 40 49% 65%;
+  --popover: 157 16% 17%; --popover-foreground: 39 34% 90%; --popover-border: 154 10% 29%;
+  --primary: 40 49% 65%; --primary-foreground: 157 18% 13%; --secondary: 155 13% 23%; --secondary-foreground: 39 34% 90%;
+  --muted: 155 13% 23%; --muted-foreground: 39 14% 67%; --accent: 14 48% 63%; --accent-foreground: 157 18% 13%;
+  --destructive: 5 54% 55%; --destructive-foreground: 39 34% 90%; --input: 154 10% 29%; --ring: 40 49% 65%;
+  --chart-1: 40 49% 65%; --chart-2: 14 48% 63%; --chart-3: 157 27% 49%; --chart-4: 197 34% 64%; --chart-5: 334 36% 67%;
+}
+body[data-theme='light'] { --bg:#eee9dc; --surface:#faf7ef; --surface-2:#ded7c7; --text:#26372f; --muted:#75786e; --accent:#315d49; --accent-2:#b75f45; --line:rgba(38,55,47,.17); --lift:0 20px 55px rgba(38,55,47,.1); --corner:3px; }
+body[data-theme='cozy'] { --bg:#e8d9c4; --surface:#f9efdd; --surface-2:#d9c3a5; --text:#45372d; --muted:#806c59; --accent:#72513c; --accent-2:#b85d45; --line:rgba(69,55,45,.2); --lift:0 18px 42px rgba(69,55,45,.13); --corner:7px; }
+body[data-theme='cafe'] { --bg:#e5ddd1; --surface:#f8f3e9; --surface-2:#d5c6b2; --text:#2f3934; --muted:#73756e; --accent:#38685f; --accent-2:#ba6546; --line:rgba(47,57,52,.18); --lift:0 16px 42px rgba(47,57,52,.12); --corner:14px; }
+body[data-theme='editorial'] { --bg:#e9e7dd; --surface:#f7f5ed; --surface-2:#d9d9ce; --text:#1d3329; --muted:#677168; --accent:#244d3a; --accent-2:#a95643; --line:rgba(29,51,41,.2); --lift:0 9px 25px rgba(29,51,41,.08); --corner:0; }
+body[data-theme='dark'] { --bg:#1c2924; --surface:#263630; --surface-2:#35463f; --text:#eee8d9; --muted:#b3b8a9; --accent:#d3ad74; --accent-2:#db8464; --line:rgba(238,232,217,.19); --lift:0 20px 50px rgba(0,0,0,.34); --corner:5px; }
+body[data-theme='gallery'] { --bg:#242522; --surface:#302f2b; --surface-2:#41403a; --text:#f1ede3; --muted:#b7b3a9; --accent:#dad4c4; --accent-2:#c98569; --line:rgba(241,237,227,.18); --lift:0 20px 50px rgba(0,0,0,.32); --corner:0; }
+body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; }
+::selection { background:#d3a46b; color:#24382e; }
+.topbar { height:78px; background:var(--bg); border-bottom:1px solid var(--line); backdrop-filter:none; }
+.topbar-inner,.page-body,.welcome-inner { width:min(1280px,88%); }
+.brand-mark { gap:11px; font:600 25px 'Fraunces',serif; letter-spacing:-1.1px; }
+.brand-icon { width:40px;height:40px;border:0;border-radius:0;background:var(--accent);color:var(--bg); }
+.brand-icon svg { width:27px;height:27px; }
+.brand-light { color:var(--accent-2); }
+.theme-trigger { border-radius:2px; padding:11px 14px; background:transparent; text-transform:uppercase; letter-spacing:.08em; font:10px 'DM Mono',monospace; }
+.theme-menu { border-radius:2px; }
+.welcome-band { min-height:580px; background-color:#243e33; background-image:linear-gradient(90deg,rgba(24,53,42,.96) 0%,rgba(31,64,49,.84) 51%,rgba(34,61,47,.2) 100%),url('/assets/hero-bg.jpg'); background-position:center 46%; }
+.welcome-band::before { background:linear-gradient(90deg,rgba(25,54,42,.5),transparent 80%); }
+.welcome-inner { min-height:580px; grid-template-columns:1.12fr .88fr; }
+.welcome-copy { padding:92px 0 86px; max-width:680px; }
+.eyebrow { font:500 10px 'DM Mono',monospace; letter-spacing:.17em; }
+.welcome-copy .eyebrow { color:#d8a880; }
+.welcome-copy h1 { font-size:clamp(58px,7.4vw,100px); line-height:.9; letter-spacing:-.065em; }
+.welcome-copy h1 em { color:#e7c896; }
+.welcome-copy p { max-width:355px; font-size:15px; line-height:1.8; }
+.hero-search { display:flex; width:min(480px,100%); height:58px; align-items:center; gap:12px; padding:0 17px; border:1px solid rgba(243,239,222,.35); border-radius:2px; background:rgba(246,239,221,.96); color:#41614e; box-shadow:8px 8px 0 rgba(11,34,25,.24); }
+.hero-search input { width:100%; border:0; outline:0; background:transparent; color:#26372f; font-size:12px; }
+.hero-search input::placeholder { color:#78786d; }
+.welcome-link { margin-top:25px; color:#e6cfaa; text-transform:uppercase; letter-spacing:.12em; font:10px 'DM Mono',monospace; }
+.shelf-illustration { height:375px; opacity:.86; }
+.sun-disc { top:14px;right:112px;width:240px;height:240px;background:rgba(224,181,123,.23); }
+.illustration-books { right:9%; bottom:95px; transform:rotate(-2deg) scale(1.12); }
+.shelf-line { right:0;bottom:88px;background:#9b6548; }
+.illustration-caption { right:3%;bottom:45px;font-size:9px; }
+.welcome-stamp { top:55px;right:1%;width:86px;height:86px;border:1px solid #e7d3af;color:#e7d3af;font-size:8px; }
+.page-body { position:relative; }
+.collection-section { padding:96px 0 110px; }
+.section-heading { padding-bottom:26px; border-bottom:1px solid var(--line); margin-bottom:24px; }
+.section-heading .eyebrow { margin-bottom:15px; }
+.section-heading h2 { font-size:clamp(39px,5vw,58px); }
+.section-heading>p { max-width:200px; font:italic 15px 'Fraunces',serif; text-align:right; }
+.library-toolbar { align-items:center; justify-content:space-between; margin-bottom:30px; }
+.toolbar-note { color:var(--muted); font:10px 'DM Mono',monospace; letter-spacing:.08em; text-transform:uppercase; }
+.genre-select-wrap { min-width:175px; border-radius:2px; }
+.book-grid,.skeleton-grid { grid-template-columns:repeat(5,minmax(0,1fr)); gap:34px 23px; }
+.book-card { border:0; border-radius:0; background:transparent; box-shadow:none; animation:rise-in .45s ease both; }
+.book-card:hover { box-shadow:none; transform:translateY(-5px); }
+.cover-wrap { height:auto; aspect-ratio:.72; background:#d0bd9c; box-shadow:6px 7px 0 color-mix(in srgb,var(--accent) 22%,transparent); }
+.cover-wrap img { filter:saturate(.87); }
+.cover-open { right:9px;bottom:9px;border-radius:0; }
+.cover-fallback { color:var(--text);background:linear-gradient(145deg,#d9c8a7,#b2a181); }
+.cover-fallback svg { width:33px;height:33px; }
+.book-meta { padding:18px 2px 8px; min-height:105px; }
+.genre-kicker { color:var(--accent-2); font:9px 'DM Mono',monospace; letter-spacing:.13em; }
+.book-meta h3 { margin:8px 0 6px; font-size:19px; line-height:1.15; }
+.book-meta p { font-size:11px; }
+.state-panel { border-radius:0; padding:65px 20px; }
+.contribute-section { padding:80px 0 105px; border-top:1px solid var(--line); }
+.contribute-number { font:10px 'DM Mono',monospace; letter-spacing:.12em; color:var(--accent-2); }
+.contribute-intro h2 { font-size:clamp(48px,6vw,73px); line-height:.96; }
+.contribute-intro p { max-width:335px; line-height:1.8; }
+.upload-card { border-radius:0; background:var(--surface); box-shadow:12px 12px 0 color-mix(in srgb,var(--accent) 13%,transparent); }
+.upload-card-heading h3 { font:500 29px 'Fraunces',serif; }
+.upload-mark { border-radius:0; }
+.field-label input,.review-label input,.review-label textarea { border-radius:0; }
+.file-drop { border-radius:0; }
+.button-primary,.button-secondary { border-radius:1px; letter-spacing:.025em; }
+.page-footer,.reader-footer { border-top:1px solid var(--line); }
+.page-footer { min-height:96px; gap:18px; }
+.page-footer .brand-icon,.reader-footer .brand-icon { width:31px;height:31px; }
+.page-footer>span,.reader-footer>span { color:var(--muted);font:italic 13px 'Fraunces',serif; }
+.footer-credit { font:9px 'DM Mono',monospace!important; letter-spacing:.04em; font-style:normal!important; }
+.reader-page { min-height:100dvh; padding-bottom:20px; }
+.reader-topbar { background:var(--bg);border-bottom:1px solid var(--line); }
+.reader-heading { width:min(1020px,88%); padding:65px 0 38px; }
+.reader-book-cover { width:112px;height:155px;border-radius:0;box-shadow:7px 8px 0 color-mix(in srgb,var(--accent) 24%,transparent); }
+.reader-book-copy h1 { font-size:clamp(38px,5.6vw,67px);line-height:.96; }
+.reader-tools { width:min(1020px,88%); padding:13px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line); }
+.reader-tools button,.reader-tools select,.reader-tools a { border-radius:1px; }
+.reader-music-panel { width:min(1020px,88%); border-radius:0; }
+.reader-content-shell { width:min(1020px,88%); border-radius:0; box-shadow:0 15px 50px rgba(24,36,29,.08); }
+.reader-content { min-height:65vh; padding:68px clamp(24px,8vw,120px); }
+.reader-content .reader-text { max-width:680px; }
+.reader-page .reading-progress { background:transparent; }
+.community-reviews { width:min(1020px,88%); margin:78px auto 0; padding:50px 0 72px; border-top:1px solid var(--line); }
+.review-intro { max-width:570px; }
+.review-intro h2 { margin:0; font:500 clamp(39px,5vw,58px)/1 'Fraunces',serif; letter-spacing:-.05em; }
+.review-intro>p { color:var(--muted); font-size:13px; line-height:1.7; }
+.review-summary { display:flex; align-items:center; gap:12px; margin-top:20px; }
+.review-summary>strong { font:500 31px 'Fraunces',serif; }
+.summary-stars,.review-item-stars { display:flex; gap:3px; color:var(--accent-2); }
+.review-summary small { color:var(--muted);font:10px 'DM Mono',monospace; }
+.review-columns { display:grid; grid-template-columns:minmax(0,.86fr) minmax(0,1.14fr); gap:72px; margin-top:43px; align-items:start; }
+.review-form { padding:27px; border:1px solid var(--line); background:var(--surface); }
+.review-form h3,.review-empty h3 { margin:0 0 4px; font:500 25px 'Fraunces',serif; }
+.review-form-note { margin:0 0 24px; color:var(--muted); font-size:11px; }
+.rating-field { margin:0 0 18px; padding:0; border:0; }
+.rating-field legend,.review-label { margin-bottom:8px; font:600 11px 'DM Sans',sans-serif; }
+.rating-field legend span { color:var(--accent-2); }
+.rating-buttons { display:flex; gap:5px; margin-top:9px; }
+.rating-buttons button { display:grid;place-items:center;width:34px;height:34px;padding:0;border:1px solid var(--line);background:transparent;color:var(--accent-2);transition:transform .18s ease,background .18s ease; }
+.rating-buttons button:hover { transform:translateY(-2px);background:var(--surface-2); }
+.review-label { display:block; margin-top:16px; color:var(--text); }
+.review-label>span { margin-left:5px;color:var(--muted);font:10px 'DM Mono',monospace;font-weight:400; }
+.review-label input,.review-label textarea { display:block;width:100%;margin-top:7px;padding:11px 12px;border:1px solid var(--line);background:var(--bg);color:var(--text);font-size:12px;outline-color:var(--accent); }
+.review-label textarea { resize:vertical;line-height:1.6; }
+.review-submit { width:100%;margin-top:17px; }
+.review-error,.review-success { padding:10px 12px;margin:12px 0 0;font-size:11px;line-height:1.5; }
+.review-error { background:color-mix(in srgb,#a54238 12%,var(--surface));color:#a54238; }
+.review-success { background:color-mix(in srgb,var(--accent) 12%,var(--surface));color:var(--accent); }
+.review-list { border-top:1px solid var(--line); }
+.review-item { padding:21px 0 22px;border-bottom:1px solid var(--line); }
+.review-item-top { display:flex;align-items:baseline;justify-content:space-between;gap:12px; }
+.review-item-top strong { font:500 18px 'Fraunces',serif; }
+.review-item-top time { color:var(--muted);font:9px 'DM Mono',monospace; }
+.review-item-stars { margin-top:9px; }
+.review-item>p { margin:10px 0 0;max-width:600px;color:var(--text);font-size:13px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere; }
+.review-empty { padding:40px 25px 42px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--surface) 65%,transparent); }
+.review-empty-mark { display:block;margin-bottom:17px;color:var(--accent-2);font:10px 'DM Mono',monospace; }
+.review-empty h3 { font-size:29px; }
+.review-empty p { max-width:330px;margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.7; }
+.review-fetch-error .button-secondary { margin-top:17px; }
+.review-loading { display:grid;gap:13px; }
+.review-skeleton { padding:20px 0;border-bottom:1px solid var(--line); }
+.review-skeleton i { display:block;width:44%;height:10px;margin:8px 0;background:linear-gradient(100deg,var(--surface-2),var(--surface),var(--surface-2));background-size:200% 100%;animation:skeleton-shimmer 1.6s ease-in-out infinite; }
+.review-skeleton i:nth-child(2) { width:22%; }.review-skeleton i:nth-child(3) { width:82%;height:24px; }
+.reader-footer { width:min(1020px,88%);min-height:92px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:15px; }
+.reader-footer .brand-mark { font-size:19px; }
+.reader-footer>span { font:9px 'DM Mono',monospace;font-style:normal; }
+.reader-footer>a { display:flex;align-items:center;gap:7px;color:var(--accent);text-decoration:none;font-size:10px; }
+@media (max-width:900px) {
+  .book-grid,.skeleton-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .review-columns { gap:34px; }
+}
+@media (max-width:680px) {
+  .topbar { height:66px; }.topbar-inner,.page-body,.welcome-inner { width:91%; }
+  .brand-mark { font-size:21px; }.brand-icon { width:34px;height:34px; }
+  .welcome-band,.welcome-inner { min-height:510px; }.welcome-inner { display:block; }
+  .welcome-copy { padding:83px 0 70px; }.welcome-copy h1 { font-size:clamp(53px,12vw,76px); }
+  .shelf-illustration { width:62%;height:150px;right:-4%;bottom:0;opacity:.46; }
+  .sun-disc { width:110px;height:110px;top:5px;right:40px; }.illustration-books { transform:scale(.62);transform-origin:bottom right;right:5%;bottom:31px; }
+  .shelf-line { bottom:26px; }.illustration-caption { display:none; }.welcome-stamp { width:60px;height:60px;top:19px;right:0;font-size:7px; }
+  .collection-section { padding:65px 0 75px; }.section-heading { align-items:flex-start;flex-direction:column;gap:10px; }
+  .section-heading>p { text-align:left; }.book-grid,.skeleton-grid { grid-template-columns:repeat(2,minmax(0,1fr));gap:25px 15px; }
+  .cover-wrap { aspect-ratio:.72; }.book-meta { padding:15px 1px 6px; }.book-meta h3 { font-size:17px; }
+  .contribute-section { padding:62px 0 70px;grid-template-columns:1fr;gap:27px; }.contribute-intro h2 { font-size:52px; }
+  .upload-card { padding:21px 17px; }.page-footer { padding:16px 0;min-height:auto;flex-wrap:wrap; }.page-footer>span { order:unset;margin:0;width:auto; }
+  .footer-credit { width:100%!important;order:4; }
+  .reader-topbar { height:62px;padding:0 4%; }.reader-topbar>.brand-mark { position:static;transform:none;font-size:17px; }
+  .reader-topbar .brand-icon { display:grid;width:29px;height:29px; }.reader-back span { display:none; }
+  .reader-heading { width:92%;padding:39px 0 25px;gap:17px; }.reader-book-cover { width:85px;height:118px; }
+  .reader-book-copy h1 { font-size:34px; }.reader-tools,.reader-content-shell,.reader-status,.reader-music-panel { width:92%; }
+  .reader-tools { justify-content:flex-start; }.reader-content { min-height:440px;padding:29px 21px; }
+  .pdf-reader,.epub-reader { min-height:440px;height:65vh; }.community-reviews { width:92%;margin-top:55px;padding:36px 0 48px; }
+  .review-columns { grid-template-columns:1fr;gap:32px;margin-top:30px; }.review-form { padding:21px 17px; }
+  .reader-footer { width:92%;min-height:80px;flex-wrap:wrap;padding:13px 0; }.reader-footer>span { font-size:8px; }
+}
