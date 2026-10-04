@@ -540,7 +540,7 @@ button { cursor:pointer; }
 .theme-option { width:100%; border:0; background:transparent; display:flex; align-items:center; gap:10px; padding:9px; border-radius:9px; text-align:left; color:var(--text); }
 .theme-option.selected { background:var(--surface-2); }
 .theme-swatch { width:22px; height:22px; border:1px solid var(--line); border-radius:7px; flex:none; }
-.swatch-light { background:#f5f5f2; }.swatch-cozy { background:#eadcc7; }.swatch-cafe { background:#356f6a; }.swatch-editorial { background:#1d4d39; }.swatch-dark { background:#25282a; }
+.swatch-light { background:#f5f5f2; }.swatch-cozy { background:#eadcc7; }.swatch-cafe { background:#356f6a; }.swatch-editorial { background:#1d4d39; }.swatch-dark { background:#25282a; }.swatch-gallery { background:linear-gradient(135deg,#181818 0 50%,#e5e2dc 50%); }
 .theme-copy { display:flex; flex-direction:column; flex:1; gap:2px; }.theme-copy strong { font-size:12px; font-weight:600; }.theme-copy small { color:var(--muted); font-size:10px; }
 .welcome-band { min-height:475px; color:#f4f1e8; position:relative; overflow:hidden; background:#244637 url('/assets/hero-bg.jpg') center 48%/cover no-repeat; }
 .welcome-band::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg,rgba(20,43,33,.91) 0%,rgba(26,54,41,.78) 48%,rgba(25,48,38,.3) 100%); }
@@ -631,3 +631,86 @@ button { cursor:pointer; }
 }
 @media (max-width:680px) { .hero-search { height:48px; margin:21px 0 15px; padding:0 13px; }.hero-search input { font-size:11px; }.library-toolbar { margin-bottom:15px; } }
 
+/* Gallery — a monochrome editorial reading room. Kept scoped so existing moods stay untouched. */
+body[data-theme='gallery'] {
+  --bg:#171717;
+  --surface:#222222;
+  --surface-2:#303030;
+  --text:#eeece7;
+  --muted:#b7b4ae;
+  --accent:#d0cec8;
+  --accent-2:#e1dfda;
+  --line:rgba(238,236,231,.17);
+  --lift:0 18px 46px rgba(0,0,0,.34);
+  --corner:4px;
+}
+body[data-theme='gallery'] .topbar,
+body[data-theme='gallery'] .reader-topbar {
+  background:color-mix(in srgb,var(--bg) 93%,transparent);
+}
+body[data-theme='gallery'] .brand-icon { color:var(--accent); }
+body[data-theme='gallery'] .status-dot { background:#e5e2dc; }
+body[data-theme='gallery'] .welcome-band {
+  color:#f0eee9;
+  background-color:#181818;
+  background-image:linear-gradient(90deg,rgba(16,16,16,.94),rgba(24,24,24,.82) 49%,rgba(26,26,26,.48)),url('/assets/hero-bg.jpg');
+  background-blend-mode:normal,luminosity;
+}
+body[data-theme='gallery'] .welcome-band::before {
+  background:linear-gradient(90deg,rgba(13,13,13,.52) 0%,rgba(20,20,20,.29) 52%,rgba(20,20,20,.1) 100%);
+}
+body[data-theme='gallery'] .welcome-copy .eyebrow,
+body[data-theme='gallery'] .welcome-copy h1 em,
+body[data-theme='gallery'] .welcome-link,
+body[data-theme='gallery'] .welcome-stamp {
+  color:#e5e2dc;
+}
+body[data-theme='gallery'] .welcome-link { border-color:rgba(229,226,220,.58); }
+body[data-theme='gallery'] .hero-search {
+  color:#c7c5bf;
+  background:rgba(35,35,35,.96);
+  border-color:rgba(238,236,231,.25);
+  box-shadow:0 12px 35px rgba(0,0,0,.25);
+}
+body[data-theme='gallery'] .hero-search input { color:#f0eee9; }
+body[data-theme='gallery'] .hero-search input::placeholder { color:#b7b4ae; }
+body[data-theme='gallery'] .sun-disc { background:rgba(230,228,223,.14); }
+body[data-theme='gallery'] .sprig { filter:grayscale(1); }
+body[data-theme='gallery'] .illo-book { background:#777!important; box-shadow:inset 5px 0 rgba(255,255,255,.13),4px 4px 10px rgba(0,0,0,.3); }
+body[data-theme='gallery'] .book-one { background:#777!important; }
+body[data-theme='gallery'] .book-two { background:#aaa!important; }
+body[data-theme='gallery'] .book-three { background:#626262!important; }
+body[data-theme='gallery'] .book-four { background:#898989!important; }
+body[data-theme='gallery'] .book-five { background:#4f4f4f!important; }
+body[data-theme='gallery'] .shelf-line { background:#a5a39e; box-shadow:0 8px 0 rgba(0,0,0,.45); }
+body[data-theme='gallery'] .illustration-caption { color:rgba(238,236,231,.72); }
+body[data-theme='gallery'] .welcome-stamp { border-color:rgba(238,236,231,.48); }
+body[data-theme='gallery'] .button-primary {
+  background:#dfddd7;
+  color:#202020;
+}
+body[data-theme='gallery'] .button-primary:hover { background:#f0eee9; }
+body[data-theme='gallery'] .notice-success { background:#303631; color:#d6ddd6; }
+body[data-theme='gallery'] .notice-error { background:#3b2d2b; color:#f0cbc5; }
+body[data-theme='gallery'] .error-panel p,
+body[data-theme='gallery'] .reader-status,
+body[data-theme='gallery'] .reader-music-copy small[role='status'] { color:#e6aaa0; }
+body[data-theme='gallery'] .reader-text mark { background:#d8d5cd; color:#202020; }
+body[data-theme='gallery'] .theme-option:focus-visible,
+body[data-theme='gallery'] .theme-trigger:focus-visible,
+body[data-theme='gallery'] .reader-tools button:focus-visible,
+body[data-theme='gallery'] .reader-tools a:focus-visible,
+body[data-theme='gallery'] .button-primary:focus-visible,
+body[data-theme='gallery'] .button-secondary:focus-visible {
+  outline:2px solid #e5e2dc;
+  outline-offset:3px;
+}
+@media (max-width:680px) {
+  body[data-theme='gallery'] .welcome-band {
+    background-image:linear-gradient(90deg,rgba(16,16,16,.95),rgba(20,20,20,.82)),url('/assets/hero-bg.jpg');
+  }
+  body[data-theme='gallery'] .shelf-illustration { width:45%; height:85px; right:-2%; bottom:0; opacity:.52; }
+  body[data-theme='gallery'] .sun-disc { width:65px; height:65px; top:0; right:28px; }
+  body[data-theme='gallery'] .illustration-books { transform:scale(.38); transform-origin:bottom right; right:5%; bottom:6px; }
+  body[data-theme='gallery'] .shelf-line { bottom:5px; }
+}

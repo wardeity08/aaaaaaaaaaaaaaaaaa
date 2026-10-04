@@ -27,6 +27,7 @@ const themes: ThemeOption[] = [
   { id: 'cafe', name: 'Café', note: 'A little warmth' },
   { id: 'editorial', name: 'Editorial', note: 'Ink & parchment' },
   { id: 'dark', name: 'Dark Reading', note: 'Low light, easy reading' },
+  { id: 'gallery', name: 'Gallery', note: 'Charcoal & ivory' },
 ];
 
 const readerThemes = themes;
@@ -483,6 +484,7 @@ function applyEpubTheme(rendition: any, theme: string) {
     cafe: { text: '#332b27', background: '#faf5ee' },
     editorial: { text: '#17241e', background: '#faf9f4' },
     dark: { text: '#eeeae2', background: '#272727' },
+    gallery: { text: '#eeece7', background: '#202020' },
   };
   const palette = colors[theme] || colors.light;
   rendition.themes.register('openshelf-theme', { body: { color: `${palette.text} !important`, background: `${palette.background} !important` } });
