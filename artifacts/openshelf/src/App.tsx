@@ -44,7 +44,14 @@ function useTheme(storageKey = 'openshelf-theme', options: ThemeOption[] = theme
 }
 
 function Brand() {
-  return <a className="brand-mark" href="/" aria-label="OpenShelf home"><span className="brand-icon"><BookOpen size={20} strokeWidth={1.7} /></span><span>open<span className="brand-light">shelf</span></span></a>;
+  return <a className="brand-mark" href="/" aria-label="OpenShelf home"><span className="brand-icon"><svg className="brand-books-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <rect x="1.5" y="8" width="3.6" height="13" rx="1" fill="currentColor" opacity=".66" />
+    <rect x="5.6" y="4.5" width="3.8" height="16.5" rx="1" fill="currentColor" />
+    <rect x="9.9" y="6.5" width="3.4" height="14.5" rx="1" fill="var(--accent-2)" />
+    <rect x="13.7" y="3" width="4.1" height="18" rx="1" fill="currentColor" />
+    <rect x="18.3" y="9" width="4.2" height="12" rx="1" fill="currentColor" opacity=".72" />
+    <path d="M2.4 11h1.8M6.6 8h1.8M10.7 10h1.8M14.8 6.6h1.9M19.3 12h2" stroke="var(--surface)" strokeWidth=".7" strokeLinecap="round" opacity=".82" />
+  </svg></span><span>open<span className="brand-light">shelf</span></span></a>;
 }
 
 function ThemePicker({ theme, onChange, options = themes }: { theme: string; onChange: (theme: string) => void; options?: ThemeOption[] }) {

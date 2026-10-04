@@ -525,7 +525,7 @@ button { cursor:pointer; }
 .topbar { position:sticky; top:0; z-index:20; height:72px; border-bottom:1px solid var(--line); background:color-mix(in srgb,var(--bg) 91%,transparent); backdrop-filter:blur(16px); }
 .topbar-inner { width:min(1200px,90%); height:100%; margin:auto; display:flex; justify-content:space-between; align-items:center; }
 .brand-mark { display:inline-flex; align-items:center; gap:10px; text-decoration:none; font:600 23px 'Fraunces',serif; letter-spacing:-.8px; color:var(--text); }
-.brand-icon { width:34px; height:34px; display:grid; place-items:center; color:var(--accent); border:1px solid var(--line); border-radius:50%; }
+.brand-icon { width:34px; height:34px; display:grid; place-items:center; color:var(--accent); border:1px solid var(--line); border-radius:50%; }.brand-books-mark { display:block; width:21px; height:21px; }
 .brand-light { font-weight:500; }
 .topbar-right { display:flex; align-items:center; gap:24px; }
 .topbar-note { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); letter-spacing:.02em; }
