@@ -48,16 +48,15 @@ function useTheme(storageKey = 'openshelf-theme', options: ThemeOption[] = theme
 }
 
 function Brand() {
-  return <a className="brand-mark" href="/" aria-label="OpenShelf home">
-    <span className="brand-icon" style={{ background: 'transparent', border: 0, color: 'inherit' }}>
+  return (
+    <a className="brand-mark" href="/" aria-label="OpenShelf home">
       <img
         src="/ChatGPT%20Image%20Oct%209%2C%202026%2C%2012_02_25%20AM.png"
-        alt=""
-        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+        alt="OpenShelf"
+        className="brand-logo"
       />
-    </span>
-    <span>open<span className="brand-light">shelf</span></span>
-  </a>;
+    </a>
+  );
 }
 
 function CommunityReviews({ bookId }: { bookId: string }) {
