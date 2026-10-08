@@ -45,18 +45,8 @@ function useTheme(storageKey = 'openshelf-theme', options: ThemeOption[] = theme
     localStorage.setItem(storageKey, theme);
   }, [theme, storageKey]);
   return [theme, setTheme] as const;
-}
-
 function Brand() {
-  return (
-    <a className="brand-mark" href="/" aria-label="OpenShelf home">
-      <img
-        src="/ChatGPT%20Image%20Oct%209%2C%202026%2C%2012_02_25%20AM.png"
-        alt="OpenShelf"
-        className="brand-logo"
-      />
-    </a>
-  );
+  return <a className="brand-mark" href="/" aria-label="OpenShelf home"><span className="brand-icon"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M5 25V8.5L16 4l11 4.5V25l-11-4.2L5 25Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/><path d="M16 9v11.8M9 11.2v8.4M23 11.2v8.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/><circle cx="16" cy="26.5" r="1.3" fill="var(--accent-2)"/></svg></span><span>open<span className="brand-light">shelf</span></span></a>;
 }
 
 function CommunityReviews({ bookId }: { bookId: string }) {
